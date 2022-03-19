@@ -37,13 +37,15 @@ def main():
 def handle_dialog(res, req):
     user_id = req['session']['user_id']
     if req['session']['new']:
-        response_with_buttons(res, 'Привет! Назови своё имя!', yn=False)
+        res['response']['text'] = 'Привет! Назови своё имя!'
         sessionStorage[user_id] = {
             'first_name': None,  # здесь будет храниться имя
             'game_started': False  # здесь информация о том, что пользователь начал игру. По умолчанию False
         }
         return
-
+    if 'помощь' in req['request']['command']:
+        res['response']['text'] = 'текс помощи'
+        return
     if sessionStorage[user_id]['first_name'] is None:
         first_name = get_first_name(req)
         if first_name is None:
@@ -57,16 +59,6 @@ def handle_dialog(res, req):
             response_with_buttons(res,
                                   f'Приятно познакомиться, {first_name.title()}. Я Алиса. Отгадаешь город по фото?',
                                   yn=True)
-            res['response']['buttons'] = [
-                {
-                    'title': 'Да',
-                    'hide': True
-                },
-                {
-                    'title': 'Нет',
-                    'hide': True
-                }
-            ]
     else:
         # У нас уже есть имя, и теперь мы ожидаем ответ на предложение сыграть.
         # В sessionStorage[user_id]['game_started'] хранится True или False в зависимости от того,
