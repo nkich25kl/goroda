@@ -37,7 +37,7 @@ def main():
 def handle_dialog(res, req):
     user_id = req['session']['user_id']
     if req['session']['new']:
-        res['response']['text'] = 'Привет! Назови своё имя!'
+        response_with_buttons(res, 'Привет! Назови своё имя!', yn=False)
         sessionStorage[user_id] = {
             'first_name': None,  # здесь будет храниться имя
             'game_started': False  # здесь информация о том, что пользователь начал игру. По умолчанию False
@@ -54,7 +54,9 @@ def handle_dialog(res, req):
             sessionStorage[user_id]['guessed_cities'] = []
             # как видно из предыдущего навыка, сюда мы попали, потому что пользователь написал своем имя.
             # Предлагаем ему сыграть и два варианта ответа "Да" и "Нет".
-            res['response']['text'] = f'Приятно познакомиться, {first_name.title()}. Я Алиса. Отгадаешь город по фото?'
+            response_with_buttons(res,
+                                  f'Приятно познакомиться, {first_name.title()}. Я Алиса. Отгадаешь город по фото?',
+                                  yn=True)
             res['response']['buttons'] = [
                 {
                     'title': 'Да',
@@ -89,7 +91,7 @@ def handle_dialog(res, req):
                 res['response']['text'] = 'Ну и ладно!'
                 res['end_session'] = True
             else:
-                res['response']['text'] = 'Не поняла ответа! Так да или нет?'
+                response_with_buttons(res, 'Не поняла ответа! Так да или нет?', yn=True)
                 res['response']['buttons'] = [
                     {
                         'title': 'Да',
@@ -128,17 +130,7 @@ def play_game(res, req):
         if get_city(req) == city:
             # если да, то добавляем город к sessionStorage[user_id]['guessed_cities'] и
             # отправляем пользователя на второй круг. Обратите внимание на этот шаг на схеме.
-            res['response']['text'] = 'Правильно! Сыграем ещё?'
-            res['response']['buttons'] = [
-                {
-                    'title': 'Да',
-                    'hide': True
-                },
-                {
-                    'title': 'Нет',
-                    'hide': True
-                }
-            ]
+            response_with_buttons(res, 'Правильно! Сыграем ещё?', yn=True)
             sessionStorage[user_id]['guessed_cities'].append(city)
             sessionStorage[user_id]['game_started'] = False
             return
@@ -149,17 +141,7 @@ def play_game(res, req):
                 # В этом случае говорим ответ пользователю,
                 # добавляем город к sessionStorage[user_id]['guessed_cities'] и отправляем его на второй круг.
                 # Обратите внимание на этот шаг на схеме.
-                res['response']['text'] = f'Вы пытались. Это {city.title()}. Сыграем ещё?'
-                res['response']['buttons'] = [
-                    {
-                        'title': 'Да',
-                        'hide': True
-                    },
-                    {
-                        'title': 'Нет',
-                        'hide': True
-                    }
-                ]
+                response_with_buttons(res, f'Вы пытались. Это {city.title()}. Сыграем ещё?', yn=True)
                 sessionStorage[user_id]['game_started'] = False
                 sessionStorage[user_id]['guessed_cities'].append(city)
                 return
@@ -191,6 +173,25 @@ def get_first_name(req):
             # Если есть сущность с ключом 'first_name', то возвращаем её значение.
             # Во всех остальных случаях возвращаем None.
             return entity['value'].get('first_name', None)
+
+
+def response_with_buttons(res, text, yn=False):
+    res['response']['card']['title'] = text
+    res['response']['buttons'] = [
+        {
+            'title': 'Помощь',
+            'hide': True
+        }
+    ]
+    if yn:
+        res['response']['buttons'].extend({
+            'title': 'Да',
+            'hide': True
+        },
+            {
+                'title': 'Нет',
+                'hide': True
+            })
 
 
 if __name__ == '__main__':
