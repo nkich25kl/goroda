@@ -56,9 +56,15 @@ def handle_dialog(res, req):
             sessionStorage[user_id]['guessed_cities'] = []
             # как видно из предыдущего навыка, сюда мы попали, потому что пользователь написал своем имя.
             # Предлагаем ему сыграть и два варианта ответа "Да" и "Нет".
-            response_with_buttons(res,
-                                  f'Приятно познакомиться, {first_name.title()}. Я Алиса. Отгадаешь город по фото?',
-                                  yn=True)
+            res['response']['text'] = f'Приятно познакомиться, {first_name.title()}. Я Алиса. Отгадаешь город по фото?'
+            res['response']['buttons'] = [{
+                'title': 'Да',
+                'hide': True
+            },
+                {
+                    'title': 'Нет',
+                    'hide': True
+                }]
     else:
         # У нас уже есть имя, и теперь мы ожидаем ответ на предложение сыграть.
         # В sessionStorage[user_id]['game_started'] хранится True или False в зависимости от того,
