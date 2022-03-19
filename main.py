@@ -10,8 +10,8 @@ app = Flask(__name__)
 logging.basicConfig(level=logging.INFO)
 
 cities = {
-    'миасс':['1652229/429b373ea0f92f0de446', '937455/2fb1af1ea036f4b0b5a1'],
-    'амсердам':['965417/c5aeef359128df21e3d9', '1533899/da486fcb30dc46388b10'],
+    'миасс': ['1652229/429b373ea0f92f0de446', '937455/2fb1af1ea036f4b0b5a1'],
+    'амсердам': ['965417/c5aeef359128df21e3d9', '1533899/da486fcb30dc46388b10'],
     'москва': ['1540737/daa6e420d33102bf6947', '213044/7df73ae4cc715175059e'],
     'нью-йорк': ['1652229/728d5c86707054d4745f', '1030494/aca7ed7acefde2606bdc'],
     'париж': ["1652229/f77136c2364eb90a3ea8", '123494/aca7ed7acefd12e606bdc']
@@ -75,7 +75,7 @@ def handle_dialog(res, req):
             if 'да' in req['request']['nlu']['tokens']:
                 # если пользователь согласен, то проверяем не отгадал ли он уже все города.
                 # По схеме можно увидеть, что здесь окажутся и пользователи, которые уже отгадывали города
-                if len(sessionStorage[user_id]['guessed_cities']) == 3:
+                if len(sessionStorage[user_id]['guessed_cities']) == 5:
                     # если все три города отгаданы, то заканчиваем игру
                     res['response']['text'] = 'Ты отгадал все города!'
                     res['end_session'] = True
@@ -145,7 +145,7 @@ def play_game(res, req):
             return
         else:
             # если нет
-            if attempt == 3:
+            if attempt == 5:
                 # если попытка третья, то значит, что все картинки мы показали.
                 # В этом случае говорим ответ пользователю,
                 # добавляем город к sessionStorage[user_id]['guessed_cities'] и отправляем его на второй круг.
@@ -197,4 +197,3 @@ def get_first_name(req):
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port)
-#<p>The server encountered an internal error and was unable to complete your request. Either the server is overloaded or there is an error in the application.</p>
